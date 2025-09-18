@@ -98,3 +98,4 @@ function performAbility(hero){
 }
 
 performAbility(Thorin);
+
