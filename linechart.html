@@ -11,31 +11,76 @@
 <body>
     <h1> Line chart </h1>
     <div>
-  <canvas id="myChart"></canvas>
+  <canvas id="linechart"></canvas>
 </div>
     
 </body>
 <script>
-  const ctx = document.getElementById('myChart');
+class LineChart{
+    constructor(canvasId, dataUrl){
+        this.canvasid = canvasId;
+        this.dataUrl = dataUrl;
+        this.chart = null;
 
-  new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-      datasets: [{
-        label: '# of Votes',
-        data: [12, 19, 3, 5, 2, 3],
-        borderWidth: 1
-      }]
-    },
-    options: {
-      scales: {
-        y: {
-          beginAtZero: true
-        }
-      }
     }
-  });
+
+    renderChart(data){
+        const ctx = document.getElementById(this.canvasId).getcontext("2d");
+
+        this.chart = new Chart(ctx,{
+            type:"line",
+            data:{
+                //labels
+                labels: data.labels,
+                datasets:[{
+                    label:"monthly data",
+                    //data
+                    data:data.values,
+                    borderwidth:1
+                }]
+            },
+            optons:{
+                scales:{
+                    y:{
+                        beginAtZero:true
+                    }
+                }
+            }
+        
+        });
+    }
+
+    async fetchData(){
+        try{
+            const response = await fetch (this.dataurl);
+            if(response.ok) throw new Error(`Failed to load data: ${response.statustext})`);
+
+            const data = await response.json();
+
+            return data;
+
+        } catch(eror){
+            console.error("Error fetching data:", error);
+            return null;
+
+        }
+
+    }
+
+    async init(){
+        const data = await this.fetchData();
+        if (data){
+            this.renderChart(data);
+        }
+
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", ()=>{
+        const chart = new LineChart("linechart", "linedata.json");
+        chart.init();
+
+    })
 
 </script>
 </html>
